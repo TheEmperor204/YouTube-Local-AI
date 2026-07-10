@@ -186,6 +186,16 @@ def stop_ollama_if_started():
                 pass
     except ImportError:
         pass
+    # Aggressive cleanup: kill any lingering llama-server processes
+    try:
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                if 'llama-server' in proc.info['name']:
+                    proc.kill()
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+    except Exception:
+        pass
     _ollama_started_by_us = False
     _ollama_process = None
     log.info("Ollama stopped - GPU/CPU resources released")
