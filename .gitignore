@@ -1,0 +1,41 @@
+# Secrets and tokens
+.env
+client_secrets.json
+yt_token.pickle
+
+# Runtime data
+*.json
+*_token.pickle
+progress_status.json
+approval_queue.json
+explicit_trigger.json
+failed_upload_counter.json
+music_config.json
+schedule_config.json
+skip_segments.json
+posted_shorts.json
+
+# Virtual environment
+youtubee-env/
+__pycache__/
+*.pyc
+
+# Test output
+YT_TEST_OUTPUT/
+temp_segments/
+youtube_posted_archive/
+videos_to_upload/
+video_duplicates/
+explicit_videos/
+failed_uploads/
+
+# Text files (may contain personal data)
+*.txt
+HANDOFF_DOC.txt
+
+# Backups
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
