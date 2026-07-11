@@ -108,7 +108,7 @@ for _d in [VIDEO_FOLDER_PATH, POSTED_SHORTS_DIR, TEMP_SEGMENTS_DIR, EXPLICIT_VID
 
 VIDEO_EXTS = {".mp4", ".mov", ".avi"}
 
-PYTHON312 = "python3.12"
+PYTHON312 = sys.executable
 TRANSCRIBE_HELPER = str(Path(__file__).resolve().parent / "transcribe_helper.py")
 
 try:
@@ -199,6 +199,21 @@ def stop_ollama_if_started():
     _ollama_started_by_us = False
     _ollama_process = None
     log.info("Ollama stopped - GPU/CPU resources released")
+
+@atexit.register
+def _force_kill_all_llama_processes():
+    try:
+        import psutil
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                pname = proc.info['name']
+                if pname and ('llama-server' in pname or 'ollama' in pname):
+                    proc.kill()
+            except (psutil.NoSuchProcess, psutil.AccessDenied, Exception):
+                pass
+        stop_ollama_if_started()
+    except Exception:
+        pass
 
 atexit.register(stop_ollama_if_started)
 signal.signal(signal.SIGTERM, lambda s, f: (stop_ollama_if_started(), sys.exit(1)))
@@ -1323,7 +1338,7 @@ def run_once():
                     parent = current_segment.name.rsplit("_part", 1)[0] if "_part" in current_segment.name else current_segment.name
                     clear_skip_segments(parent)
 
-            return True
+        return True
         try:
             success = upload_short_to_youtube(str(video_to_use), caption)
         except Exception as e:
