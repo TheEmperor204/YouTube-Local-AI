@@ -53,7 +53,7 @@ Key settings:
 - YT_DRY_RUN=true - Test mode (no real uploads)
 - VIDEO_FOLDER=videos_to_upload/ - Videos to process
 - POSTED_SHORTS_DIR=youtube_posted_archive/ - Archived videos
-- NTFY_TOPIC=YouTube-AI-Emperor204 - Phone notifications
+- NTFY_TOPIC=<your_ntfy_topic> - Phone notifications
 - GPU_GUARD=true - Wait for GPU idle before processing
 
 ## Usage

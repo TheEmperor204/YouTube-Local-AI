@@ -1338,7 +1338,7 @@ def run_once():
                     parent = current_segment.name.rsplit("_part", 1)[0] if "_part" in current_segment.name else current_segment.name
                     clear_skip_segments(parent)
 
-        return True
+            return True
         try:
             success = upload_short_to_youtube(str(video_to_use), caption)
         except Exception as e:
