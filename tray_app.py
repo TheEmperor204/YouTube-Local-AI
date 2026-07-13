@@ -188,12 +188,15 @@ class TrayPopup(QWidget):
         self.reel_boot_delay = QSpinBox()
         self.reel_boot_delay.setRange(0, 60)
         self.reel_boot_delay.setSuffix(" min")
+        self.reel_boot_delay.setValue(int(self.config.get("REEL_DELAY_AFTER_BOOT_MINUTES", "2")))
         self.reel_min_hours = QSpinBox()
         self.reel_min_hours.setRange(1, 24)
         self.reel_min_hours.setSuffix(" hr")
+        self.reel_min_hours.setValue(int(self.config.get("REEL_MIN_INTERVAL_HOURS", "4")))
         self.reel_max_hours = QSpinBox()
         self.reel_max_hours.setRange(1, 48)
         self.reel_max_hours.setSuffix(" hr")
+        self.reel_max_hours.setValue(int(self.config.get("REEL_MAX_INTERVAL_HOURS", "8")))
         rl.addRow("Delay after boot:", self.reel_boot_delay)
         rl.addRow("Min interval:", self.reel_min_hours)
         rl.addRow("Max interval:", self.reel_max_hours)
@@ -300,6 +303,9 @@ class TrayPopup(QWidget):
                 "POSTED_SHORTS_DIR": self.archive_folder_input.text(),
                 "NTFY_TOPIC": self.ntfy_topic.text(),
                 "GPU_GUARD": "true" if self.gpu_guard_checkbox.isChecked() else "false",
+                "REEL_DELAY_AFTER_BOOT_MINUTES": str(self.reel_boot_delay.value()),
+        "REEL_MIN_INTERVAL_HOURS": str(self.reel_min_hours.value()),
+        "REEL_MAX_INTERVAL_HOURS": str(self.reel_max_hours.value()),
             })
             QMessageBox.information(self, "Saved", "Settings saved!")
             self.config.load()

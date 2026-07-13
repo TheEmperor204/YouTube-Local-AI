@@ -20,7 +20,7 @@ import math
 import tempfile
 import base64
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from music_overlay import add_music_to_video
 from progress_writer import update_progress, clear_progress, add_error, clear_error, get_approval_for_video, remove_approval_for_video, save_on_hold_video, remove_on_hold_video, get_on_hold_videos, save_skip_segments, get_skip_segments, clear_skip_segments, send_notification, signal_explicit_detected, clear_explicit_trigger, clear_failed_upload, increment_retry
 
@@ -28,6 +28,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 from explicit_filter import check_explicit
+from schedule_manager import calculate_wait
+from schedule_manager import calculate_wait
 
 try:
     from caption_persona import PERSONA_REEL
@@ -710,7 +712,7 @@ def move_to_duplicates(video_path):
 
 def log_to_posted_txt(video_name, details=""):
     """Append video name to posted_shorts.txt for human-readable tracking."""
-    from datetime import datetime
+    from datetime import datetime, timedelta
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"{timestamp} | {video_name}"
     if details:
@@ -1327,7 +1329,7 @@ def run_once():
                 f"=== FRAME ANALYSIS ===\n{combined_description}\n\n=== TRANSCRIPT ===\n{transcript or '(no audio)'}\n\n=== CAPTION ===\n{caption}"
             )
             log.info(f"DRY RUN: saved {orig_name} + caption + transcript to {DRY_RUN_DIR}")
-            send_notification("Short Posted (DRY)", caption[:80])
+            msg=caption[:80];_w=int(os.getenv("REEL_MIN_INTERVAL_HOURS","4"));_x=int(os.getenv("REEL_MAX_INTERVAL_HOURS","8"));_y=calculate_wait(_w,_x);_z=datetime.now()+timedelta(hours=_y);msg+=f"\nNext: ~{int(_y)}h{int((_y-int(_y))*60)}m ({_z.strftime("%H:%M")})";_rem=sum(1 for f in VIDEO_FOLDER_PATH.iterdir() if f.is_file() and f.suffix.lower() in{".mp4",".mov",".avi"})+(sum(1 for f in TEMP_SEGMENTS_DIR.iterdir() if f.is_file() and f.suffix.lower() in{".mp4",".mov",".avi"}) if TEMP_SEGMENTS_DIR.exists() else 0);msg+=f" | Remaining: {_rem}";send_notification("Short Posted (DRY)",msg)
             # Clean up segment in dry run so next cycle picks up next part
             is_segment = "_part" in current_segment.name
             if is_segment:
@@ -1372,7 +1374,7 @@ def run_once():
                 log.info(f"Single video archived to {POSTED_SHORTS_DIR}")
             log.info("Short cycle complete!")
             clear_failed_upload(current_segment.name)
-            send_notification("Short Posted", caption[:80])
+            msg=caption[:80];_w=int(os.getenv("REEL_MIN_INTERVAL_HOURS","4"));_x=int(os.getenv("REEL_MAX_INTERVAL_HOURS","8"));_y=calculate_wait(_w,_x);_z=datetime.now()+timedelta(hours=_y);msg+=f"\nNext: ~{int(_y)}h{int((_y-int(_y))*60)}m ({_z.strftime("%H:%M")})";_rem=sum(1 for f in VIDEO_FOLDER_PATH.iterdir() if f.is_file() and f.suffix.lower() in{".mp4",".mov",".avi"})+(sum(1 for f in TEMP_SEGMENTS_DIR.iterdir() if f.is_file() and f.suffix.lower() in{".mp4",".mov",".avi"}) if TEMP_SEGMENTS_DIR.exists() else 0);msg+=f" | Remaining: {_rem}";send_notification("Short Posted",msg)
         else:
             log.error("Upload failed - tracking retry")
             add_error("Upload failed - tracking retry")
